@@ -3,7 +3,6 @@
 .pytest_cache
 __pycache__
 
-.env
 poetry.toml
 
 app.log

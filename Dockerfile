@@ -16,5 +16,7 @@ ENV PYTHONPATH=/app
 
 COPY . /app
 
+RUN ls -la /app
+
 EXPOSE 8000
 CMD ["fastapi", "run"]
