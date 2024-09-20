@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Depends, UploadFile, status
 from fastapi.responses import JSONResponse
 
@@ -5,6 +7,7 @@ from app.adapters import Uploader, FaceCloud, get_uploader, get_facecloud
 from app.repository import TaskRepository, get_task_repository
 from app.models import TaskModel
 
+logger = logging.getLogger(__name__)
 
 def get_task_service(
     uploader: Uploader = Depends(get_uploader),
@@ -22,10 +25,12 @@ class TaskService:
 
     async def create_task(self) -> JSONResponse:
         task_id = await self._repository.create_task()
+        logger.info(f'Создана задача с идентификатором {task_id}')
         return JSONResponse({'task_id': task_id}, status_code=status.HTTP_201_CREATED)
 
-    async def delete_task(self, id: int) -> JSONResponse:
-        await self._repository.delete_task(id)
+    async def delete_task(self, task_id: int) -> JSONResponse:
+        await self._repository.delete_task(task_id)
+        logger.info(f'Удалена задача с идентификатором {task_id}')
         return JSONResponse('Задача успешно удалена', status_code=status.HTTP_200_OK)
 
     async def add_image(self, task_id: int, image: UploadFile, image_name: str | None) -> TaskModel:

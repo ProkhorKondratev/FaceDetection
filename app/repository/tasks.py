@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +8,8 @@ from fastapi import Depends, HTTPException
 
 from app.db import get_db_session, TaskTable, ImageTable, FaceTable
 from app.models import TaskModel, ImageModel, FaceModel
+
+logger = logging.getLogger(__name__)
 
 
 def get_task_repository(session: AsyncSession = Depends(get_db_session)) -> 'TaskRepository':
@@ -20,20 +24,24 @@ class TaskRepository:
         task = TaskTable()
         self._session.add(task)
         await self._session.commit()
+        logger.info(f'Создана задача с идентификатором {task.id}')
         return task.id
 
     async def delete_task(self, task_id: int) -> None:
         task = await self._session.get(TaskTable, task_id)
         if not task:
+            logger.warning(f'Задачи с ID {task_id} не существует')
             raise HTTPException(404, f'Задачи с ID {task_id} не существует')
 
         await self._session.delete(task)
         await self._session.commit()
+        logger.info(f'Удалена задача с идентификатором {task_id}')
 
     async def add_image(self, task_id: int, image_name: str, image_path: str):
         image = ImageTable(task_id=task_id, name=image_name, path=image_path)
         self._session.add(image)
         await self._session.commit()
+        logger.info(f'Добавлено изображение {image_name} к задаче с идентификатором {task_id}')
         return image
 
     async def add_faces(self, image_id: int, faces_data: dict):
@@ -49,6 +57,7 @@ class TaskRepository:
 
         self._session.add_all(faces)
         await self._session.commit()
+        logger.info(f'Добавлено {len(faces)} лиц к изображению с идентификатором {image_id}')
         return faces
 
     async def get_task_info(self, task_id: int) -> TaskModel:
@@ -61,6 +70,7 @@ class TaskRepository:
         task = result.scalar_one_or_none()
 
         if not task:
+            logger.warning(f'Задачи с ID {task_id} не существует')
             raise HTTPException(404, f'Задачи с ID {task_id} не существует')
 
         total_faces = 0
@@ -96,4 +106,5 @@ class TaskRepository:
             average_female_age=average_female_age,
         )
 
+        logger.info(f'Получена информация о задаче с идентификатором {task_id}')
         return task_model

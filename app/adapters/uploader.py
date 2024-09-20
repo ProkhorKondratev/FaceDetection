@@ -1,9 +1,12 @@
+import logging
 from uuid import uuid4
 from pathlib import Path
 
 import aiofiles.os as aos
 import aiofiles
 from fastapi import UploadFile, HTTPException
+
+logger = logging.getLogger(__name__)
 
 
 def get_uploader() -> 'Uploader':
@@ -18,8 +21,9 @@ class Uploader:
         await aos.makedirs(upload_dir, exist_ok=True)
 
     async def _check_image(self, image: UploadFile) -> None:
+        logger.info(f'Проверка изображения {image.filename}')
         if image.content_type != 'image/jpeg':
-            raise ValueError('Неверный формат изображения')
+            raise ValueError(f'Неверный формат изображения {image.content_type}')
 
     async def upload_image(self, image: UploadFile) -> Path:
         try:
@@ -32,4 +36,5 @@ class Uploader:
 
             return image_path
         except Exception as e:
+            logger.error(f'Ошибка при загрузке изображения: {e}')
             raise HTTPException(status_code=400, detail=str(e))
