@@ -25,7 +25,7 @@ class TaskRepository:
     async def delete_task(self, task_id: int) -> None:
         task = await self._session.get(TaskTable, task_id)
         if not task:
-            raise HTTPException(404, f"Задачи с ID {task_id} не существует")
+            raise HTTPException(404, f'Задачи с ID {task_id} не существует')
 
         await self._session.delete(task)
         await self._session.commit()
@@ -61,7 +61,7 @@ class TaskRepository:
         task = result.scalar_one_or_none()
 
         if not task:
-            raise HTTPException(404, f"Задачи с ID {task_id} не существует")
+            raise HTTPException(404, f'Задачи с ID {task_id} не существует')
 
         total_faces = 0
         total_males = 0

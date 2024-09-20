@@ -14,9 +14,7 @@ RUN poetry install --no-root
 
 ENV PYTHONPATH=/app
 
-COPY . /app
-
-RUN ls -la /app
+COPY ./app /app/app
 
 EXPOSE 8000
 CMD ["fastapi", "run"]

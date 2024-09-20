@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy import exc
 from sqlalchemy.orm import DeclarativeBase
 
+from fastapi import HTTPException
+
 from app.settings import settings
 
 
@@ -18,7 +20,7 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             await session.commit()
         except exc.SQLAlchemyError:
             await session.rollback()
-            raise
+            raise HTTPException(status_code=500, detail="Ошибка получения данных из БД")
 
 
 class Base(DeclarativeBase):

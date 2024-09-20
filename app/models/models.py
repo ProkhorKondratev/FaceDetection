@@ -7,6 +7,9 @@ class FaceModel(BaseModel):
     gender: str
     age: float
 
+    class Config:
+        from_attributes = True
+
 
 class ImageModel(BaseModel):
     name: str

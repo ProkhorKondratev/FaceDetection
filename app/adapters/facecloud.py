@@ -40,7 +40,7 @@ class FaceCloud:
             response.raise_for_status()
             self._api_token = response.json()['data']['access_token']
         except httpx.HTTPStatusError:
-            raise HTTPException(401, "Ошибка аутентификации в FaceCloud")
+            raise HTTPException(401, 'Ошибка аутентификации в FaceCloud')
 
     async def get_token(self) -> str:
         """Возвращает токен аутентификации, если он еще не получен — запрашивает новый."""
@@ -58,15 +58,15 @@ class FaceCloud:
                 response = await self._client.post(
                     f"{self._api_url}/detect",
                     headers={
-                        "Authorization": f"Bearer {token}",
-                        "Content-Type": "image/jpeg",
+                        'Authorization': f'Bearer {token}',
+                        'Content-Type': 'image/jpeg',
                     },
                     content=image_data,
                     params={
-                        "demographics": "true",
+                        'demographics': 'true',
                     },
                 )
                 response.raise_for_status()
                 return response.json()['data']
             except httpx.HTTPStatusError:
-                raise HTTPException(400, "Ошибка обработки изображения в FaceCloud")
+                raise HTTPException(400, 'Ошибка обработки изображения в FaceCloud')

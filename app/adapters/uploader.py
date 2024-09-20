@@ -3,7 +3,7 @@ from pathlib import Path
 
 import aiofiles.os as aos
 import aiofiles
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 
 
 def get_uploader() -> 'Uploader':
@@ -22,11 +22,14 @@ class Uploader:
             raise ValueError('Неверный формат изображения')
 
     async def upload_image(self, image: UploadFile) -> Path:
-        await self._check_upload_dir(self._upload_dir)
-        await self._check_image(image)
+        try:
+            await self._check_upload_dir(self._upload_dir)
+            await self._check_image(image)
 
-        image_path = Path(f"{self._upload_dir}/{uuid4()}.jpeg")
-        async with aiofiles.open(image_path, 'wb') as file:
-            await file.write(await image.read())
+            image_path = Path(f"{self._upload_dir}/{uuid4()}.jpeg")
+            async with aiofiles.open(image_path, 'wb') as file:
+                await file.write(await image.read())
 
-        return image_path
+            return image_path
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))

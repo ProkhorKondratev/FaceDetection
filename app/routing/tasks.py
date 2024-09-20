@@ -2,6 +2,7 @@ from fastapi.routing import APIRouter
 from fastapi import Depends, UploadFile, File
 
 from app.services import get_task_service, TaskService
+from app.models import TaskModel
 
 router = APIRouter()
 
@@ -17,7 +18,7 @@ async def delete_task(task_id: int, service: TaskService = Depends(get_task_serv
 
 
 @router.get('/tasks/{task_id}', description='Получить информацию о задаче')
-async def get_task_info(task_id: int, service: TaskService = Depends(get_task_service)):
+async def get_task_info(task_id: int, service: TaskService = Depends(get_task_service)) -> TaskModel:
     return await service.get_task_info(task_id)
 
 
@@ -27,5 +28,5 @@ async def add_image_to_task(
     image_name: str,
     image: UploadFile = File(),
     service: TaskService = Depends(get_task_service),
-):
+) -> TaskModel:
     return await service.add_image(task_id, image, image_name)
